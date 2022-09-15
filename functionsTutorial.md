@@ -258,7 +258,7 @@ This function implements the **CAVI** algorithm to obtain the optimal **PFM-VB**
 -   <code>y<sub>0</sub></code>: vector of binary (all zeros) response variables for censored observations
 -   `om2`: prior variance for *β*<sub>*j*</sub>'s coefficients (*ω*<sub>*p*</sub><sup>2</sup> in the paper)
 -   `zT`: censoring threshold (*z*<sub>*T*</sub> in the paper), needed to center correctly the intercept parameter
--   `tolerance`: absolute change in the ELBO*q*<sub>PFM-VB</sub>( **β** , **z** ) used to establish convergence
+-   `tolerance`: absolute change in the ELBO[*q*<sub>PFM-VB</sub>( **β** , **z** )] used to establish convergence
 -   `maxIter`: maximum number of allowed iterations before stopping
 -   `fullVar`: boolean parameter. If `FALSE`, only the approximate marginal variances are returned. If `TRUE`, the full variance-covariance matrix is returned
 -   `predictive`: boolean parameter. If `TRUE`, returns several quantities, useful for evaluating predictive functionals and already evaluated to implement the CAVI updates.
