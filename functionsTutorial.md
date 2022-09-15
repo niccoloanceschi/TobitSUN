@@ -1,7 +1,7 @@
 Introduction
 ============
 
-As described in the [`README.md`](link) file, this tutorial provides details on the functions required to **implement most of the methods presented in Section 4 of the paper**, in the specific case of **tobit regression**. The `R` source file can be found in [`functionsTobit.R`](link).
+As described in the [`README.md`](https://github.com/niccoloanceschi/TobitSUN/blob/main/README.md) file, this tutorial provides details on the functions required to **implement most of the methods presented in Section 4 of the paper**, in the specific case of **tobit regression**. The `R` source file can be found in [`functionsTobit.R`](https://github.com/niccoloanceschi/TobitSUN/blob/main/functionsTobit.R).
 
 
 Implemented functions

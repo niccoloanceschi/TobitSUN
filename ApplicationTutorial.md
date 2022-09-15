@@ -1,7 +1,7 @@
 Introduction
 ============
 
-As described in the [`README.md`](link) file, this tutorial contains general guidelines and code to **replicate the  simulation studies reported in Section 5** of the paper, which focus on **tobit regression**.
+As described in the [`README.md`](https://github.com/niccoloanceschi/TobitSUN/blob/main/README.md) file, this tutorial contains general guidelines and code to **replicate the  simulation studies reported in Section 5** of the paper, which focus on **tobit regression**.
 For ease of presentation, we hereby consider single combinations of number of covariates *p* $\in \mathbb{N}$ and censoring percentage *k* = $\lfloor 100 \cdot \kappa \rfloor \in \{0,1,\dots,100\}$.
 Original Figures and Tables from the paper gather the outcomes for multiple values of *p* and *k*, and can be thus reproduced by running the code below for all the settings analyzed therein.
 
@@ -30,7 +30,7 @@ Setting the hyperparameters, loading data and required packages
 ===============================================================
 
 We recommend beginning by cleaning the workspace and setting the working directory to the folder the source code is located.
-Then, we load the dedicated source code [`functionsTobit.R`](link) and other required libraries, assumed to have been previously downloaded.
+Then, we load the dedicated source code [`functionsTobit.R`](https://github.com/niccoloanceschi/TobitSUN/blob/main/functionsTobit.R) and other required libraries, assumed to have been previously downloaded.
 
 ``` r
 rm(list = ls())
