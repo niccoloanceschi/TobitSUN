@@ -2,7 +2,7 @@ Introduction
 ============
 
 As described in the [`README.md`](https://github.com/niccoloanceschi/TobitSUN/blob/main/README.md) file, this tutorial contains general guidelines and code to **replicate the  simulation studies reported in Section 5** of the paper, which focus on **tobit regression**.
-For ease of presentation, we hereby consider single combinations of number of covariates *p* $\in \mathbb{N}$ and censoring percentage *k* = $\lfloor 100 \cdot \kappa \rfloor \in \{0,1,\dots,100\}$.
+For ease of presentation, we hereby consider single combinations of number of covariates *p* $\in \mathbb{N}$ and censoring percentage *k* = $\lfloor 100 \cdot \kappa \rfloor \in$ { $0,1,\dots,100$ }.
 Original Figures and Tables from the paper gather the outcomes for multiple values of *p* and *k*, and can be thus reproduced by running the code below for all the settings analyzed therein.
 
 Tobit simulations
@@ -11,18 +11,18 @@ Tobit simulations
 The code below shows how to **generate and load the data** corresponding to the different settings analyzed in Section 5 and explains in detail the `R` code to **implement the different methods for posterior inference** discussed in Section 4, including both sampling-based schemes and fast deterministic approximations. 
 
 As discussed in paper, in the empirical studies from Section 5 we simulate a total of $n$ $\in \mathbb{N}$ observations from a standard tobit model under censoring proportions $\kappa \in [0,1]$, dividing the data $n_0=\kappa\cdot n$ censored observations and $n_1=(1-\kappa)\cdot n$ uncensored ones.
-Exploiting the latent utility interpretation of tobit regression, the responses $y_i$, $i=1, \ldots, n$, are obtained by first simulating the associated  utilities $z_i$, $i=1, \ldots, n$, from a univariate normal distribution $\cal{N}$(**x**<sub>i</sub>$^{\intercal}$**β**$, 1)$, and then setting $y_i=z_i$$\mathbb{1}$$(z_i>z_T)$, for each $i=1, \ldots, n$ where $z_T$ is a pre-specified truncation threshold to obtain the desired proportion of censored observations under different values of $\kappa$.
+Exploiting the latent utility interpretation of tobit regression, the responses $y_i$, $i=1, \ldots, n$, are obtained by first simulating the associated  utilities $z_i$, $i=1, \ldots, n$, from a univariate normal distribution $\cal{N}$(**x**<sub>i</sub>$^{\intercal}$**β**$, 1)$, and then setting $y_i=z_i \mathbb{1} (z_i>z_T)$, for each $i=1, \ldots, n$ where $z_T$ is a pre-specified truncation threshold to obtain the desired proportion of censored observations under different values of $\kappa$.
 The $p$ unit--specific predictors in **x**<sub>i</sub>, $i=1, \ldots, n$, are instead simulated from standard Gaussians, except for the intercept term, whereas the regression coefficients in **β** are generated from a uniform distribution in the range $[-5,5]$.
 The response vetor **y** $=  (y_1,\dots,y_n)^\intercal$ and design matrix **X** $=$ $($**x**$_1,\dots,$**x**$_n)^\intercal$ are divided into two sets **y**<sub>0</sub>,**X**<sub>0</sub> and **y**<sub>1</sub>,**X**<sub>1</sub>, associated respectively with censored and uncensored observations.
 Other than the $n$ in-sample observations, we generate analogous $n$<sub>Test</sub> out-sample statistical units, later used for assessing predictive performances.
 In doing so, we abide to the recommended practice of standardizing the predictors to have $0$ mean and standard deviation $0.5$ (see [Gelman et al., 2008](https://doi.org/10.1214/08-AOAS191) and [Chopin and Ridgway, 2017](https://doi.org/10.1214/16-STS581)).
-Posterior inference relies on  spherical Gaussian priors $\cal{N}_p$(**0**$,\omega_p^2$**Ι**$_p)$, with $\omega_p^2=25 \cdot 10 \, /p$, inducing increasing shrinkage in high dimensions.
+Posterior inference relies on  spherical Gaussian priors $\cal{N}_p$(**0**$,\omega_p^2$**Ι**$_p$), with $\omega_p^2=25 \cdot 10 \, /p$, inducing increasing shrinkage in high dimensions.
 Note that the varying threshold $z_T$ poses no difficulties in Bayesian inference since it directly enters the intercept term.
 
 The results from Section 5 correspond to different combinations of the aforementioned hyperparameters, in particular:
 
--   $p \in \{10,20,50,100,200,400,800,1200\}$
--   *k* $\in \{15,50,85\}$
+-   *p* $\in$ { $10,20,50,100,200,400,800,1200$ }
+-   *k* $\in$ { $15,50,85$ }
 -   $n = 200$
 -   $n$<sub>Test</sub> $= 200$
 
@@ -113,8 +113,11 @@ timeSUN = difftime(Sys.time(), startTime, units=("secs"))[[1]]
 We leverage on the MCMC samples obtained above to evaluate empirical posterior moments and predictive functionals.
 Later on, we are going to use these quantities as a ground-truth to validate and compare with one another the outcomes of different approximation schemes.
 
-In particular, we assess predictive performance via the expected value of the linear predictor
-$\mathbb{E}[0\cdot\Phi(-$**x**<sub>NEW</sub>$^{\intercal}$**β**$)\,+\,($**x**<sub>NEW</sub>$^{\intercal}$**β**$)\, \Phi($**x**<sub>NEW</sub>$^{\intercal}$**β**$)$$\,\mid\,$y<sub>NEW</sub>, **y**<sub>1</sub>, **y**<sub>0</sub>$] \,= \mathbb{E}[($**x**<sub>NEW</sub>$^{\intercal}$**β**$)\,\Phi($**x**<sub>NEW</sub>$^{\intercal}$**β**$)\,\mid\,$y<sub>NEW</sub>, **y**<sub>1</sub>, **y**<sub>0</sub>$]$ and the probability of a censoring event $\mathbb{E}[\Phi(-$**x**<sub>NEW</sub>$^{\intercal}$**β**$)\,\mid\,$y<sub>NEW</sub>, **y**<sub>1</sub>, **y**<sub>0</sub>$]$, computed for every statistical unit y<sub>NEW</sub>$,$**x**<sub>NEW</sub> within the $n$<sub>Test</sub> out-sample observations simulated together with the original training data.
+In particular, we assess predictive performance by computing expected value and censoring probability for every statistical unit *y*<sub>NEW</sub>$,$**x**<sub>NEW</sub> within the $n$<sub>Test</sub> out-sample observations, simulated together with the original training data :</br>
+&emsp; $\mathbb{E}$ [ *y*<sub>NEW</sub> | **y**<sub>1</sub>, **y**<sub>0</sub> ] =
+$\mathbb{E}$ [ $0\cdot\Phi$(-**x**<sub>NEW</sub>$^{\intercal}$**β**) + (**x**<sub>NEW</sub>$^{\intercal}$**β**) $\Phi$(**x**<sub>NEW</sub>$^{\intercal}$**β**) | *y*<sub>NEW</sub>, **y**<sub>1</sub>, **y**<sub>0</sub>] =
+$\mathbb{E}$ [ (**x**<sub>NEW</sub>$^{\intercal}$**β**) $\Phi$(**x**<sub>NEW</sub>$^{\intercal}$**β**) | *y*<sub>NEW</sub>, **y**<sub>1</sub>, **y**<sub>0</sub> ] </br>
+&emsp; $\mathbb{P}$ [ *y*<sub>NEW</sub> = 0 | **y**<sub>1</sub>, **y**<sub>0</sub> ] = $\mathbb{E}$ [ $\Phi$(-**x**<sub>NEW</sub>$^{\intercal}$**β**) | *y*<sub>NEW</sub>, **y**<sub>1</sub>, **y**<sub>0</sub> ] .
 
 ``` r
 # First 2 marginal moments
@@ -166,7 +169,7 @@ probitModel = "data{
                 }"
 ```
 
-Secondly, we evaluate the parameters of the updated Gaussian prior $\cal{N}_p($**ξ**<sub>POST</sub>,**Ω**<sub>POST</sub>,$)$.
+Secondly, we evaluate the parameters of the updated Gaussian prior $\cal{N}_p$(**ξ**<sub>POST</sub>,**Ω**<sub>POST</sub>).
 Furthermore, we select a good initialization point for the sampler, by exploiting the results of an approximation of the posterior (EP in this case), with the goal of accelerating convergence of the MCMC chain.
 
 ``` r
@@ -221,7 +224,8 @@ We now turn the attention to the deterministic approximation procedures describe
 Mean-field variational Bayes (MF-VB)
 ------------------------------------
 
-We start by implementing mean-field variational Bayes to obtain the optimal Gaussian density *q*\*<sub>MF-VB</sub>(**β**) within the factorized family of joint densities $\cal{Q}$<sub>MF-VB</sub> $= \{$*q*(**β**,**z**<sub>0</sub>) :  *q*(**β**,**z**<sub>0</sub>) = *q*(**β**) *q*(**z**<sub>0</sub>)$\}$, where **z**<sub>0</sub> represents the latent Gaussian utilities associated with censored observations **y**<sub>0</sub>.
+We start by implementing mean-field variational Bayes to obtain the optimal Gaussian density *q*\*<sub>MF-VB</sub>(**β**) within the factorized family of joint densities
+$\cal{Q}$<sub>MF-VB</sub> = { *q*(**β**,**z**<sub>0</sub>) :  *q*(**β**,**z**<sub>0</sub>) = *q*(**β**) *q*(**z**<sub>0</sub>) }, where **z**<sub>0</sub> represents the latent Gaussian utilities associated with censored observations **y**<sub>0</sub>.
 
 ``` r
 # Get parameters
@@ -257,9 +261,9 @@ predProbMF = pnorm(-locPredMF/sdPredMF)
 Partially-factorized mean-field variational Bayes (PFM-VB)
 ----------------------------------------------------------
 
-Secondly, we implement partially-factorized mean-field variational Bayes, returning the optimal approximate joint posterior *q*\*<sub>PFM-VB</sub>(**β**,**z**<sub>0</sub>) within the class $\cal{Q}$<sub>MF-VB</sub> $= \{$*q*(**β**,**z**<sub>0</sub>) :  *q*(**β**,**z**<sub>0</sub>) = *q*(**β** $\mid$  **z**<sub>0</sub>) $\prod_{i=1}^{n_0}$ *q*(z<sub>0[i]</sub>)$\}$.
+Secondly, we implement partially-factorized mean-field variational Bayes, returning the optimal approximate joint posterior *q*\*<sub>PFM-VB</sub>(**β**,**z**<sub>0</sub>) within the class $\cal{Q}$<sub>PFM-VB</sub> = {*q*(**β**,**z**<sub>0</sub>) :  *q*(**β**,**z**<sub>0</sub>) = *q*(**β** |  **z**<sub>0</sub>) $\prod~_{i=1}^{n_0}$ *q*(*z*<sub>0[i]</sub>) }.
 
-While it holds that  *q*\*<sub>PFM-VB</sub>(**β** $\mid$ **z**<sub>0</sub>) = *p*(**β** $\mid$ **z**<sub>0</sub>) , as detailed in Section 4.3.1 of the paper, the optimal marginal density *q*\*<sub>PFM-VB</sub>(**β**) = $\int$ *q*\*<sub>PFM-VB</sub>(**β**,**z**<sub>0</sub>) $\prod_{i=1}^{n_0}$ *q*\*<sub>PFM-VB</sub>(z<sub>0[i]</sub>) dz<sub>0[i]</sub> corresponds to SUN random variable with a specific structure.
+While can be easily seen that *q*\*<sub>PFM-VB</sub>(**β** | **z**<sub>0</sub>) = *p*(**β** | **z**<sub>0</sub>) , as detailed in Section 4.3.1 of the paper, the optimal marginal density *q*\*<sub>PFM-VB</sub>(**β**) = $\int$ *q*\*<sub>PFM-VB</sub>(**β**, **z**<sub>0</sub>) d**z**<sub>0</sub> = $\int$ *p*(**β** | **z**<sub>0</sub>) $\prod~_{i=1}^{n_0}$ *q*\*<sub>PFM-VB</sub>(*z*<sub>0[i]</sub>) d*z*<sub>0[i]</sub> corresponds to SUN random variable with a specific structure.
 Indeed, the covariance matrix appearing within the Gaussian cdf term of the SUN density *q*\*<sub>PFM-VB</sub>(**β**) has non-zero elements only on the main diagonal, which allow for straightforward calculations of the corresponding moments.
 We refer to [Fasano, Durante and Zanella (2022)](https://doi.org/10.1093/biomet/asac026) for further explanations.
 
