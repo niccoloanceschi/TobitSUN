@@ -21,7 +21,7 @@ The **list of the main implemented functions** is reported below. Each of them i
 
 ### `rSUNpost`
 
-This function **samples from the exact unified skew-normal posterior distribution** *p*( **β** ∣ **y** ) under multivariate normal prior for **β** having the form *p*( **β** ) = *ϕ*( **β** ; *ω*<sub>*p*</sub><sup>2</sup> **I**<sub>*p*</sub> ).
+This function **samples from the exact unified skew-normal posterior distribution** *p*( **β** ∣ **y** ) under multivariate normal prior for **β** having the form *p*( **β** ) = *ϕ*<sub>*p*</sub>( **β** ; *ω*<sub>*p*</sub><sup>2</sup> **I**<sub>*p*</sub> ).
 
 **Input**:
 
