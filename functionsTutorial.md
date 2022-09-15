@@ -258,7 +258,7 @@ This function implements the **CAVI** algorithm to obtain the optimal **PFM-VB**
 -   <code>y<sub>0</sub></code>: vector of binary (all zeros) response variables for censored observations
 -   `om2`: prior variance for *β*<sub>*j*</sub>'s coefficients (*ω*<sub>*p*</sub><sup>2</sup> in the paper)
 -   `zT`: censoring threshold (*z*<sub>*T*</sub> in the paper), needed to center correctly the intercept parameter
--   `tolerance`: absolute change in the ELBO$[$*q*<sub>PFM-VB</sub>( **β** , **z** )$]$ used to establish convergence
+-   `tolerance`: absolute change in the ELBO*q*<sub>PFM-VB</sub>( **β** , **z** ) used to establish convergence
 -   `maxIter`: maximum number of allowed iterations before stopping
 -   `fullVar`: boolean parameter. If `FALSE`, only the approximate marginal variances are returned. If `TRUE`, the full variance-covariance matrix is returned
 -   `predictive`: boolean parameter. If `TRUE`, returns several quantities, useful for evaluating predictive functionals and already evaluated to implement the CAVI updates.
@@ -267,7 +267,7 @@ This function implements the **CAVI** algorithm to obtain the optimal **PFM-VB**
 **Output**: A list containing
 
 -   `mu`: optimal values of the location parameters in equation (20) of the paper. The i-th entry `mu[i]` corresponds to: <br/>
- &emsp; $\mathbb{E}$<sub>**β**,**z**<sub>-i</sub></sub>$[$**μ**<sub>i</sub>$]$ = **γ**<sub>post[i]</sub> + **Γ**<sub>post[i,-i]</sub> $($**Γ**<sub>post[-i,-i]</sub>$)$<sup>-1</sup> $($$\mathbb{E}$<sub>**β**,**z**<sub>-i</sub></sub>$[$**z**<sub>-i</sub>$]$ - **γ**<sub>post[-i]</sub>$)$
+ &emsp; $\mathbb{E}$<sub>**β**,**z**<sub>-i</sub></sub>$[$**μ**<sub>i</sub>$]$ = **γ**<sub>post[i]</sub> + **Γ**<sub>post[i,-i]</sub> $($**Γ**<sub>post[-i,-i]</sub>$)$<sup>-1</sup> $(\mathbb{E}$<sub>**β**,**z**<sub>-i</sub></sub>$[$**z**<sub>-i</sub>$]$ - **γ**<sub>post[-i]</sub>$)$
 -   `sigma2`: optimal values of the scale parameters in equation (20) of the paper. The i-th entry`sigma2[i]` corresponds to: <br/> 
  &emsp; **Γ**<sub>post[i,i]</sub> - **Γ**<sub>post[i,-i]</sub> $($**Γ**<sub>post[-i,-i]</sub>$)$<sup>-1</sup> **Γ**<sub>post[-i,i]</sub>
 -   `nIter`: number of iterations required by the CAVI, either because it converged or because the maximum number of iterations `maxIter` was reached
@@ -463,7 +463,7 @@ This function implements the **moment matching** updates to obtain the optimal *
 
 -   `meanBeta`: approximate posterior mean for the parameter *β* according to the optimal EP Gaussian approximation
 -   `diagOmega`: approximate marginal posterior variances according to the optimal EP Gaussian approximation
--   `logML`: approximation of $\log($p(**y**<sub>0</sub> $\mid$ **y**<sub>1</sub>)$)$ according to the optimal EP Gaussian approximation
+-   `logML`: approximation of *log* p(**y**<sub>0</sub> $\mid$ **y**<sub>1</sub>) according to the optimal EP Gaussian approximation
 -   `nIter`: number of iterations required by the CAVI, either because it converged or because the maximum number of iterations `maxIter` was reached
 -   `kEP`: vector of *n*<sub>0</sub> real parameters, that uniquely determine the precision matrices of the approximate Gaussian sites. For the i-th entry <code>k<sub>EP</sub>[i]</code>, it holds that
 **Q**<sub>i</sub> = k<sub>EP</sub>[i] **X**<sub>0</sub>[i,]<sup>T</sup> **X**<sub>0</sub>[i,]
@@ -688,7 +688,7 @@ This function **generate the data** analyzed in the **simulation studies** repor
 
 -   `n`: total number of in-sample observations
 -   `p`: number of covariates/parameters
--   `k`: percentage of censored observations (*100*$\cdot$$\kappa$ in the paper, as integer)
+-   `k`: percentage of censored observations (*100*$\cdot\kappa$ in the paper, as integer)
 -   `nTest`: total number of out-of-sample observations
 -   `beta`: true value of the parameters (optional)
 -   `seed`: seed of the random number generator
