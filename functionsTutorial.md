@@ -9,14 +9,10 @@ Implemented functions
 
 The **list of the main implemented functions** is reported below. Each of them is then analyzed in detail in the following.
 
--   `rSUNpost`: samples from the exact **SUN** posterior distribution. <br/>
- &emsp; See also [Durante  (2019)](https://doi.org/10.1093/biomet/asz034).
--   `getParamsMF`: returns the parameters of the optimal mean-field variational approximation (**MF-VB** in the paper). <br/>
- &emsp; See also [Blei, Kucukelbir and McAuliffe (2017)](https://doi.org/10.1080/01621459.2017.1285773).
--   `getParamsPFM`: returns the parameters of the optimal partially-factorized mean-field variational approximation (**PFM-VB** in the paper). <br/>
- &emsp; See also [Fasano, Durante and Zanella (2022)](https://doi.org/10.1093/biomet/asac026).
--   `getParamsEP`: returns the parameters of the optimal expectation propagation approximation (**EP** in the paper). <br/>
- &emsp; See also [Chopin and Ridgway (2017)](https://doi.org/10.1214/16-STS581).
+-   `rSUNpost`: samples from the exact [**SUN**](https://doi.org/10.1093/biomet/asz034) posterior distribution.
+-   `getParamsMF`: returns the parameters of the optimal mean-field variational approximation ([**MF-VB**](https://doi.org/10.1080/01621459.2017.1285773) in the paper).
+-   `getParamsPFM`: returns the parameters of the optimal partially-factorized mean-field variational approximation ([**PFM-VB**](https://doi.org/10.1093/biomet/asac026) in the paper). 
+-   `getParamsEP`: returns the parameters of the optimal expectation propagation approximation ([**EP**](https://doi.org/10.1214/16-STS581) in the paper).
 -   `generateData`: generate the data to replicate the simulation studies from Section 5 of the paper
 
 ### `rSUNpost`
