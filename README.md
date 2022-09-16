@@ -1,4 +1,4 @@
-# Bayesian conjugacy for Tobit Regression via Unified Skew-Normal Random Variables: exact and approximate inference
+# Bayesian Conjugacy for Tobit Regression via Unified Skew-Normal Random Variables: Exact and Approximate Inference
 
 This repository is associated with the article [Anceschi, Fasano, Durante and Zanella (2022+). *Bayesian conjugacy in probit, tobit, multinomial probit and extensions: A review and new results*](https://arxiv.org/abs/2206.08118). The **key contribution of the paper is outlined below**.
 
