@@ -359,10 +359,10 @@ We can now visualize the running times, as medians over 10 independent repetitio
 ``` r
 library("microbenchmark")
 
-run_approx <- summary(microbenchmark(getParamsMF(X1,y1,X0,y0,om2p,zT,nPrint=1e3),
-                                   getParamsPFM(X1,y1,X0,y0,om2p,zT,nPrint=1e3),
-                                   getParamsEP(X1,y1,X0,y0,om2p,zT,nPrint=1e3),
-                                   unit = "s", times = 10))
+run_approx <- summary(microbenchmark(getParamsMF(X1,y1,X0,y0,om2p,zT),
+                                     getParamsPFM(X1,y1,X0,y0,om2p,zT),
+                                     getParamsEP(X1,y1,X0,y0,om2p,zT),
+                                     unit = "s", times = 10))
 
 table_approx_time <- matrix(c(run_approx$median,nIterMF,nIterPFM,nIterEP),3,2)
 rownames(table_approx_time) <- c("MF-VB","PFM-VB","EP")
