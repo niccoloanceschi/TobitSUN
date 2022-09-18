@@ -381,8 +381,10 @@ Instead, we report here scatter plots for the same posterior functionals analyze
 We begin by loading the required library to generate the desired data visualization.
 
 ``` r
+library(latex2exp)
 library(reshape2)
 library(ggplot2)
+library(plyr)
 ```
 
 Then, we structure the data to construct a single plot.
