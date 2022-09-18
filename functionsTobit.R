@@ -234,9 +234,10 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
   ### Initialization
   
   mu = double(n0)
+  LogPhi = double(n0)
   
-  musiRatio = as.double(mu/sigma)
-  phiPhiRatio = exp(dnorm(musiRatio,log = T)-pnorm((2*y0-1)*musiRatio,log.p = T))
+  musiRatio = (2*y0-1)*mu/sigma
+  phiPhiRatio = exp(dnorm(musiRatio,log = T)-pnorm(musiRatio,log.p = T))
   meanZ = mu + (2*y0-1)*sigma*phiPhiRatio
   
   if(p<n0){
@@ -245,7 +246,6 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
     iMinus = c(n0,1:(n0-1))
   }
   
-  LogPhi = double(n0)
   elbo = -Inf
   diff = 1
   nIter = 0
@@ -263,9 +263,10 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
         alpha = alpha + X0[iMinus[i],]*meanZ[iMinus[i]] - X0[i,]*meanZ[i]
         mu[i] = sigma2[i]*LambdaXbeta0[i] + sigma2[i]*alpha%*%XV[i,]
         
-        musiRatio = (2*y0[i]-1)*mu[i]/sigma[i]
+        musiRatio = (2*y[i]-1)*mu[i]/sigma[i]
         LogPhi[i] = pnorm(musiRatio, log.p = T)
-        meanZ[i] = mu[i] + (2*y0[i]-1)*sigma[i]*dnorm(musiRatio)/exp(LogPhi[i])
+        phiPhiRatio = exp(dnorm(musiRatio, log = T) - LogPhi[i])
+        meanZ[i] = mu[i] + (2*y[i]-1)*sigma[i]*phiPhiRatio
         
       }
       
@@ -289,9 +290,10 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
         
         mu[i] = sigma2[i]*LambdaXbeta0[i] + A[i,]%*%meanZ
         
-        musiRatio = (2*y0[i]-1)*mu[i]/sigma[i]
+        musiRatio = (2*y[i]-1)*mu[i]/sigma[i]
         LogPhi[i] = pnorm(musiRatio, log.p = T)
-        meanZ[i] = mu[i] + (2*y0[i]-1)*sigma[i]*dnorm(musiRatio)/exp(LogPhi[i])
+        phiPhiRatio = exp(dnorm(musiRatio, log = T) - LogPhi[i])
+        meanZ[i] = mu[i] + (2*y[i]-1)*sigma[i]*phiPhiRatio
       }
       
       elbo = -crossprod(meanZ,Lambda)%*%meanZ/2 + sum(((meanZ-mu)^2)/sigma2)/2 +
@@ -322,11 +324,11 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
 
   }
   
-  musiRatio = mu/sigma
-  phiPhiRatio = exp(dnorm(musiRatio, log = T) - pnorm((2*y0-1)*musiRatio, log.p = T))
+  musiRatio = (2*y0-1)*mu/sigma
+  phiPhiRatio = exp(dnorm(musiRatio, log = T) - pnorm(musiRatio, log.p = T))
   
   meanZ = mu + (2*y0-1)*sigma*phiPhiRatio
-  postVarZ = as.double(sigma2*(1-(2*y0-1)*musiRatio*phiPhiRatio - phiPhiRatio^2))
+  postVarZ = as.double(sigma2*(1-musiRatio*phiPhiRatio - phiPhiRatio^2))
   
   W = rowSums(VXt*t(postVarZ*t(VXt)))
   
