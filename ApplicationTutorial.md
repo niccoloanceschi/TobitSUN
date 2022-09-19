@@ -53,9 +53,9 @@ Next, we set the desired values of *p* and *k* and set other hyperparameters.
 
 ``` r
 # number of covariates
-p = 800        
+p = 50         
 # percentange of censored observations
-k = 85            
+k = 50            
 
 n = 200             # total in-sample observations
 nTest = 200         # total out-sample observations
@@ -229,9 +229,7 @@ $\cal{Q}$<sub>MF-VB</sub> = { *q*(**β**,**z**<sub>0</sub>) :  *q*(**β**,**z**<
 
 ``` r
 # Get parameters
-startTime = Sys.time()
 paramsMF = getParamsMF(X1,y1,X0,y0,om2p,zT)
-timeMF = difftime(Sys.time(), startTime, units=("secs"))[[1]]
 ```
 
 As mentioned above, we validate empirically the quality of different approximation schemes by comparing the associate approximate posterior moments and predictive functionals with that of MCMC sampling.
@@ -269,9 +267,7 @@ We refer to [Fasano, Durante and Zanella (2022)](https://doi.org/10.1093/biomet/
 
 ``` r
 # Get parameters
-startTime = Sys.time()
 paramsPFM = getParamsPFM(X1,y1,X0,y0,om2p,zT,predictive=TRUE)
-timePF = difftime(Sys.time(), startTime, units=("secs"))[[1]]
 ```
 
 Conversely, predictive functional of interest can be evaluated by sampling from the resulting approximate posterior, still benefitting from the simplified structure of the latter.
@@ -319,9 +315,7 @@ Without such a feature, the previously accomplished quadratic cost in *p* would 
 
 ``` r
 # Get parameters
-startTime = Sys.time()
 paramsEP = getParamsEP(X1,y1,X0,y0,om2p,zT,predictive=TRUE)
-timeEP = difftime(Sys.time(), startTime, units=("secs"))[[1]]
 ```
 
 As before, we evaluate marginal moments and predictive functionals, benefitting once more from the Gaussianity of the approximation.
@@ -362,7 +356,7 @@ library("microbenchmark")
 run_approx <- summary(microbenchmark(getParamsMF(X1,y1,X0,y0,om2p,zT),
                                      getParamsPFM(X1,y1,X0,y0,om2p,zT),
                                      getParamsEP(X1,y1,X0,y0,om2p,zT),
-                                     unit = "s", times = 10))
+                                     unit = "s", times = 20))
 
 table_approx_time <- matrix(c(run_approx$median,nIterMF,nIterPFM,nIterEP),3,2)
 rownames(table_approx_time) <- c("MF-VB","PFM-VB","EP")

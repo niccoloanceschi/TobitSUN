@@ -86,26 +86,38 @@ getParamsMF = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,
     beta0 = Omega0%*%r0
   }else{
     invXXt = solve(diag(1.,n1,n1)+om2*tcrossprod(X1))
-    Omega0 = diag(om2,p,p) - om2*t(X1)%*%invXXt%*%X1*om2
+    Omega0 = diag(om2,p,p) - om2*crossprod(X1,invXXt%*%X1)*om2
     beta0 = om2*(r0 - crossprod(X1,invXXt%*%(X1%*%r0))*om2)
   }
   # Omega0 = 0.5*(Omega0+t(Omega0))
   
   if(p<n0) {
-    invOmega0 = solve(Omega0)
+    if(p<n1){
+      invOmega0 = solve(Omega0)
+    }else{
+      invOmega0 = diag(1./om2,p,p) + crossprod(X1)
+    }
+    
     V = solve(crossprod(X0)+invOmega0)
     diagV = diag(V)
     VXt = tcrossprod(V,X0)
     XVinvOmega0 = crossprod(VXt,invOmega0)
+    
   } else{
-    Omega0Xt = tcrossprod(Omega0,X0)
+    
+    if(p<n1){
+      Omega0Xt = tcrossprod(Omega0,X0)
+    } else {
+      Omega0Xt = om2*t(X0) - om2*crossprod(X1,invXXt%*%tcrossprod(X1,X0))*om2
+    }
+    
     Lambda = solve(diag(1, nrow = n0, ncol = n0)+X0%*%Omega0Xt)
     VXt = Omega0Xt%*%Lambda
     XVinvOmega0 = Lambda%*%X0
     diagV = diag(Omega0) - rowSums(Omega0Xt * VXt)
     H = XVinvOmega0%*%VXt # needed for ELBO
   }
-
+  
   VinvOmega0beta0 = beta0 - VXt%*%(X0%*%beta0)
   XVinvOmega0beta0 = XVinvOmega0%*%beta0
   rELBO = XVinvOmega0%*%VinvOmega0beta0 + XVinvOmega0beta0
@@ -135,13 +147,13 @@ getParamsMF = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,
   if(p<n0){
     
     while(diff > tolerance & nIter < maxIter) {
-    
+      
       mu = crossprod(VXt,crossprod(X0,meanZ)) + XVinvOmega0beta0
       meanZ = mu + (2*y0-1)*exp(dnorm(mu, log = T) - pnorm((2*y0-1)*mu, log.p = T))
       
       elboOld = elbo
       
-      elbo = -sum(crossprod(XVinvOmega0,meanZ) * (VXt%*%meanZ))/2 + sum(meanZ*rELBO) +
+      elbo = -crossprod(crossprod(XVinvOmega0,meanZ),VXt%*%meanZ)/2 + crossprod(meanZ,rELBO) +
         sum(pnorm(crossprod(signVXt,crossprod(X0,meanZ))+signXVinvOmega0beta0, log.p = T))
       
       diff = abs(elbo-elboOld)
@@ -159,7 +171,7 @@ getParamsMF = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,
       
       elboOld = elbo
       
-      elbo = -sum(meanZ *(H%*%meanZ))/2 + t(meanZ)%*%rELBO +
+      elbo = -crossprod(meanZ,H%*%meanZ)/2 + crossprod(meanZ,rELBO) +
         sum(pnorm(signXVXt%*%meanZ+signXVinvOmega0beta0, log.p = T))
       
       diff = abs(elbo-elboOld)
@@ -205,24 +217,49 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
     beta0 = Omega0%*%r0
   }else{
     invXXt = solve(diag(1.,n1,n1)+om2*tcrossprod(X1))
-    Omega0 = diag(om2,p,p) - om2*t(X1)%*%invXXt%*%X1*om2
+    Omega0 = diag(om2,p,p) - om2*crossprod(X1,invXXt%*%X1)*om2
     beta0 = om2*(r0 - crossprod(X1,invXXt%*%(X1%*%r0))*om2)
   }
   # Omega0 = 0.5*(Omega0+t(Omega0))
-    
+  
   if(p<n0) {
-    invOmega0 = solve(Omega0)
+    
+    Xbeta0 = X0%*%beta0 
+    if(p<n1){
+      invOmega0 = solve(Omega0)
+    }else{
+      invOmega0 = diag(1./om2,p,p) + crossprod(X1)
+    }
+    
     V = solve(crossprod(X0)+invOmega0)
     H = X0%*%tcrossprod(V,X0)
     Lambda = -H    # more efficient than Lambda = diag(1,nrow=n0,ncol=n0) - H
     Lambda[cbind(1:n0,1:n0)] = 1+Lambda[cbind(1:n0,1:n0)]
+    
+    VXt = tcrossprod(V,X0)
+    
+    VinvOmega0beta0 = V%*%(invOmega0%*%beta0)
+    diagV = diag(V) # V already computed
+    
   } else{
-    Omega0Xt = tcrossprod(Omega0,X0)
+    
+    Xbeta0 = X0%*%beta0 
+    if(p<n1){
+      Omega0Xt = tcrossprod(Omega0,X0)
+    } else {
+      Omega0Xt = om2*t(X0) - om2*crossprod(X1,invXXt%*%tcrossprod(X1,X0))*om2
+    }
+    
     Lambda = solve(diag(1,nrow=n0,ncol=n0)+X0%*%Omega0Xt)
-    H = diag(1,nrow=n0,ncol=n0)-Lambda
+    H = -Lambda    # more efficient than H = diag(1,nrow=n0,ncol=n0)-Lambda
+    H[cbind(1:n0,1:n0)] = 1+H[cbind(1:n0,1:n0)] 
+    
+    VXt = Omega0Xt%*%Lambda
+    
+    VinvOmega0beta0 = beta0 - VXt%*%Xbeta0
+    diagV = diag(Omega0) - rowSums(Omega0Xt * VXt)
   }
   
-  Xbeta0 = X0%*%beta0 
   LambdaXbeta0 = Lambda%*%Xbeta0
   
   sigma2 = as.vector(1/(1-diag(H)))
@@ -230,7 +267,7 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
   
   A = sigma2*H
   A[cbind(1:n0,1:n0)] = 0
-
+  
   ### Initialization
   
   mu = double(n0)
@@ -241,7 +278,6 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
   meanZ = mu + (2*y0-1)*sigma*phiPhiRatio
   
   if(p<n0){
-    XV = X0%*%V
     alpha = crossprod(meanZ,X0) - meanZ[n0]*X0[n0,]
     iMinus = c(n0,1:(n0-1))
   }
@@ -257,11 +293,11 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
     while(diff > tolerance & nIter < maxIter) {
       
       elboOld = elbo
-    
+      
       for(i in 1:n0) {
         
         alpha = alpha + X0[iMinus[i],]*meanZ[iMinus[i]] - X0[i,]*meanZ[i]
-        mu[i] = sigma2[i]*LambdaXbeta0[i] + sigma2[i]*alpha%*%XV[i,]
+        mu[i] = sigma2[i]*LambdaXbeta0[i] + sigma2[i]*alpha%*%VXt[,i]
         
         musiRatio = (2*y[i]-1)*mu[i]/sigma[i]
         LogPhi[i] = pnorm(musiRatio, log.p = T)
@@ -271,15 +307,15 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
       }
       
       XtmeanZ = crossprod(X0,meanZ)
-      elbo = -sum(meanZ^2)/2 + sum(XtmeanZ*(V%*%XtmeanZ))/2 +
-        sum(((meanZ-mu)^2)/sigma2)/2 + sum(LogPhi) + sum(meanZ*LambdaXbeta0)
-    
+      elbo = -crossprod(meanZ)/2 + crossprod(XtmeanZ,V%*%XtmeanZ)/2 +
+        crossprod((meanZ-mu)/sigma)/2 + sum(LogPhi) + crossprod(meanZ,LambdaXbeta0)
+      
       diff = abs(elbo-elboOld)
       nIter = nIter+1
-    
+      
       if(nIter%%nPrint==0) {print(paste0("iteration: ", nIter, ", ELBO: ", elbo))}
     }
-  
+    
   } else {
     
     while(diff > tolerance & nIter < maxIter) {
@@ -296,9 +332,9 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
         meanZ[i] = mu[i] + (2*y[i]-1)*sigma[i]*phiPhiRatio
       }
       
-      elbo = -crossprod(meanZ,Lambda)%*%meanZ/2 + sum(((meanZ-mu)^2)/sigma2)/2 +
-        sum(LogPhi) + sum(meanZ*LambdaXbeta0)
-    
+      elbo = -crossprod(meanZ,Lambda)%*%meanZ/2 + crossprod((meanZ-mu)/sigma)/2 +
+        sum(LogPhi) + crossprod(meanZ,LambdaXbeta0)
+      
       diff = abs(elbo-elboOld)
       nIter = nIter+1
       
@@ -307,22 +343,11 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
     
   }
   
+  ### Posterior Approximate Moments
+  
   mu = Xbeta0+A%*%(meanZ-Xbeta0)
   
   results = list(mu = mu, sigma2 = sigma2, nIter = nIter)
-  
-  ### Posterior Approximate Moments
-  
-  if(p<n0) {
-    diagV = diag(V) # V already computed
-    VXt = tcrossprod(V,X0)
-    VinvOmega0 = V%*%invOmega0
-  } else{
-    VXt = Omega0Xt%*%Lambda
-    VinvOmega0 = diag(1,nrow=p,ncol=p) - VXt%*%X0
-    diagV = diag(Omega0) - rowSums(Omega0Xt * VXt)
-
-  }
   
   musiRatio = (2*y0-1)*mu/sigma
   phiPhiRatio = exp(dnorm(musiRatio, log = T) - pnorm(musiRatio, log.p = T))
@@ -331,8 +356,6 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
   postVarZ = as.double(sigma2*(1-musiRatio*phiPhiRatio - phiPhiRatio^2))
   
   W = rowSums(VXt*t(postVarZ*t(VXt)))
-  
-  VinvOmega0beta0 = VinvOmega0%*%beta0
   
   meanBeta = VXt%*%meanZ + VinvOmega0beta0
   varBeta = diagV + W
@@ -374,7 +397,6 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
   ### Pre-Computations
   
   r = crossprod(X1,y1) + c(-zT/om2,rep(0,p-1))
-  
   if(p<n1){
     Omega0 = solve(diag(1./om2,p,p) + crossprod(X1))
     beta0 = Omega0%*%r
@@ -402,11 +424,11 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
     U0 = U
   }
   
-  logZ0 = 0.5*sum(r*beta0)
-  logZ = double(length = n0)
-  
+  logZ0 = 0.5*crossprod(r,beta0)
+
   ### Initialization
   
+  logZ = double(length = n0)
   k = double(length = n0)
   m = double(length = n0)
   
@@ -425,7 +447,7 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
       
       for(i in c(1:n0)){
         
-        xi = as.matrix(X0[i,])
+        xi = X0[i,]
         
         r_i = r - m[i]*xi
         Q_i = Q - k[i]*tcrossprod(xi)
@@ -486,7 +508,7 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
         
         u = U[,i]
         xi = X0[i,]
-        xTu = sum(xi*u)
+        xTu = crossprod(xi,u)[1]
         
         d = 1-k[i]*xTu
         w = u/d
@@ -494,7 +516,7 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
         
         if(xTw>0){
           
-          r_iTw = sum(r*w) - m[i]*xTw
+          r_iTw = crossprod(r,w) - m[i]*xTw
           
           s = (2*y0[i]-1)/sqrt(1+xTw)
           tau = s*r_iTw
@@ -507,8 +529,8 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
           
           r = r + (mNew - m[i])*xi
           
-          c = (k[i]-kNew)/(1+(kNew-k[i])*xTu)
-          U = U + (u*c)%*%crossprod(xi,U)
+          ratio = (k[i]-kNew)/(1.+(kNew-k[i])*xTu)
+          U = U + (u*ratio)%*%crossprod(xi,U)
           
           maxDiff = max(abs(c(kNew - k[i], mNew - m[i])))
           if(maxDiff>diff){diff = maxDiff}
@@ -539,7 +561,7 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
     diagOmega = diag(Omega)
     
     logDetQ = determinant(Q, logarithm = TRUE)
-    logML = sum(logZ) + 0.5*sum(r*meanBeta) - logZ0 + 
+    logML = sum(logZ) + 0.5*crossprod(r,meanBeta) - logZ0 + 
       0.5*logDetQ0$modulus[1] - 0.5*logDetQ$modulus[1] 
     
   }else{
@@ -548,7 +570,7 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
     meanBeta = beta0 + U0%*%m - U%*%(k*crossprod(U0,r))
     
     logDet = determinant(diag(1,n0,n0) + k*X0%*%U0, logarithm = TRUE)
-    logML = sum(logZ) + 0.5*sum(r*meanBeta) - logZ0 - 0.5*logDet$modulus[1]
+    logML = sum(logZ) + 0.5*crossprod(r,meanBeta) - logZ0 - 0.5*logDet$modulus[1]
   }
   
   results = list(meanBeta = meanBeta, diagOmega = diagOmega, logML = logML, 
