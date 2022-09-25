@@ -10,9 +10,9 @@ Tobit simulations
 
 The code below shows how to **generate and load the data** corresponding to the different settings analyzed in Section 5 and explains in detail the `R` code to **implement the different methods for posterior inference** discussed in Section 4, including both sampling-based schemes and fast deterministic approximations. 
 
-As discussed in paper, in the empirical studies from Section 5 we simulate a total of $n$ $\in \mathbb{N}$ observations from a standard tobit model under censoring proportions $\kappa \in [0,1]$, dividing the data $n_0=\kappa\cdot n$ censored observations and $n_1=(1-\kappa)\cdot n$ uncensored ones.
+As discussed in paper, in the empirical studies from Section 5 we simulate a total of $n$ $\in \mathbb{N}$ observations from a standard tobit model under censoring proportions $\kappa \in [0,1]$, dividing the data in $n_0=\kappa\cdot n$ censored observations and $n_1=(1-\kappa)\cdot n$ uncensored ones.
 Exploiting the latent utility interpretation of tobit regression, the responses $y_i$, $i=1, \ldots, n$, are obtained by first simulating the associated  utilities $z_i$, $i=1, \ldots, n$, from a univariate normal distribution $\cal{N}$(**x**<sub>i</sub>$^{\intercal}$**β**, 1), and then setting $y_i=z_i \mathbb{1} (z_i>z_T)$, for each $i=1, \ldots, n$ where $z_T$ is a pre-specified truncation threshold to obtain the desired proportion of censored observations under different values of $\kappa$.
-The $p$ unit--specific predictors in **x**<sub>i</sub>, $i=1, \ldots, n$, are instead simulated from standard Gaussians, except for the intercept term, whereas the regression coefficients in **β** are generated from a uniform distribution in the range $[-5,5]$.
+The $p$ unit-specific predictors in **x**<sub>i</sub>, $i=1, \ldots, n$, are instead simulated from standard Gaussians, except for the intercept term, whereas the regression coefficients in **β** are generated from a uniform distribution in the range $[-5,5]$.
 The response vetor **y** $=  (y_1,\dots,y_n)^\intercal$ and design matrix **X** $=$ $($**x**$_1,\dots,$**x**$_n)^\intercal$ are divided into two sets **y**<sub>0</sub>,**X**<sub>0</sub> and **y**<sub>1</sub>,**X**<sub>1</sub>, associated respectively with censored and uncensored observations.
 Other than the $n$ in-sample observations, we generate analogous $n$<sub>Test</sub> out-sample statistical units, later used for assessing predictive performances.
 In doing so, we abide to the recommended practice of standardizing the predictors to have $0$ mean and standard deviation $0.5$ (see [Gelman et al., 2008](https://doi.org/10.1214/08-AOAS191) and [Chopin and Ridgway, 2017](https://doi.org/10.1214/16-STS581)).
@@ -26,10 +26,12 @@ The results from Section 5 correspond to different combinations of the aforement
 -   $n = 200$
 -   $n$<sub>Test</sub> $= 200$
 
+**For illustrative purposes, we focus here on the setting *p* $=$ 50 and *k* $=$ 50**. The other scenarios in Section 5 can be readily implemented by changing *p* and *k* in the code below.
+
 Setting the hyperparameters, loading data and required packages
 ===============================================================
 
-We recommend beginning by cleaning the workspace and setting the working directory to the folder the source code is located.
+We recommend beginning by cleaning the workspace and setting the working directory to the folder where the source code is located.
 Then, we load the dedicated source code [`functionsTobit.R`](https://github.com/niccoloanceschi/TobitSUN/blob/main/functionsTobit.R) and other required libraries, assumed to have been previously downloaded.
 
 ``` r
@@ -49,7 +51,7 @@ library("rstan")
 source("functionsTobit.R")
 ```
 
-Next, we set the desired values of *p* and *k* and set other hyperparameters.
+Next, we set the desired values of *p* and *k*, and the other hyperparameters.
 
 ``` r
 # number of covariates
@@ -97,7 +99,7 @@ n0 = n-n1
 Sampling-based posterior inference
 ==================================
 
-We begin our analysis by considering sampling-based approaches to posterior inference, including both a i.i.d. sampler form the exact SUN posterior and Hamiltonian Monte Carlo, specifically the no-u-turn sampler by [Hoffman and Gelman (2014)](http://jmlr.org/papers/v15/hoffman14a.html).
+We begin our analysis by considering sampling-based approaches to posterior inference, including both an i.i.d. sampler from the exact SUN posterior and Hamiltonian Monte Carlo, specifically the no-u-turn sampler by [Hoffman and Gelman (2014)](http://jmlr.org/papers/v15/hoffman14a.html).
 
 Exact sampling from the unified skew-normal posterior (i.i.d.)
 --------------------------------------------------------------
@@ -110,10 +112,7 @@ betaSUN = rSUNpost(X1,y1,X0,y0,om2p,zT,nSample,seed=seed)
 timeSUN = difftime(Sys.time(), startTime, units=("secs"))[[1]]
 ```
 
-We leverage on the MCMC samples obtained above to evaluate empirical posterior moments and predictive functionals.
-Later on, we are going to use these quantities as a ground-truth to validate and compare with one another the outcomes of different approximation schemes.
-
-In particular, we assess predictive performance by computing expected value and censoring probability for every statistical unit *y*<sub>NEW</sub>$,$**x**<sub>NEW</sub> within the $n$<sub>Test</sub> out-sample observations, simulated together with the original training data :</br>
+We leverage on the i.i.d. samples obtained above to evaluate empirical **posterior moments** and **predictive functionals**. Later on, we are going to use these quantities as a ground-truth to validate and compare with one another the outcomes of different approximation schemes. As for predictive functionals, we assess performance by computing expected value and censoring probability for every statistical unit *y*<sub>NEW</sub>$,$**x**<sub>NEW</sub> within the $n$<sub>Test</sub> out-sample observations, simulated together with the original training data :</br>
 &emsp; $\mathbb{E}$ [ *y*<sub>NEW</sub> | **y**<sub>1</sub>, **y**<sub>0</sub> ] =
 $\mathbb{E}$ [ *z*<sub>NEW</sub> | *z*<sub>NEW</sub>>0, **y**<sub>1</sub>, **y**<sub>0</sub>] =
 $\mathbb{E}$ [ $\phi$(**x**<sub>NEW</sub>$^{\intercal}$**β**) + (**x**<sub>NEW</sub>$^{\intercal}$**β**) $\Phi$(**x**<sub>NEW</sub>$^{\intercal}$**β**) | **y**<sub>1</sub>, **y**<sub>0</sub> ] </br>
@@ -170,7 +169,7 @@ probitModel = "data{
                 }"
 ```
 
-Secondly, we evaluate the parameters of the updated Gaussian prior $\cal{N}_p$(**ξ**<sub>POST</sub>,**Ω**<sub>POST</sub>).
+Secondly, we evaluate the parameters of the updated Gaussian prior $\cal{N}_p$(**ξ**<sub>1</sub>,**Ω**<sub>1</sub>).
 Furthermore, we select a good initialization point for the sampler, by exploiting the results of an approximation of the posterior (EP in this case), with the goal of accelerating convergence of the MCMC chain.
 
 ``` r
@@ -220,7 +219,7 @@ knitr::kable(table_sampling,caption = table_caption, align = "c", digits=2)
 Fast deterministic approximations
 =================================
 
-We now turn the attention to the deterministic approximation procedures described in Section 4.3 of the paper, including in particular mean-field and partially-factorized variational inference and expectation propagation.
+We now turn the attention to the deterministic approximation procedures described in Section 4.3 of the paper, including in particular mean-field VB, partially-factorized variational inference and expectation propagation.
 
 Mean-field variational Bayes (MF-VB)
 ------------------------------------
@@ -233,7 +232,7 @@ $\cal{Q}$<sub>MF-VB</sub> = { *q*(**β**,**z**<sub>0</sub>) :  *q*(**β**,**z**<
 paramsMF = getParamsMF(X1,y1,X0,y0,om2p,zT)
 ```
 
-As mentioned above, we validate empirically the quality of different approximation schemes by comparing the associate approximate posterior moments and predictive functionals with that of MCMC sampling.
+As mentioned above, we validate empirically the quality of the different approximation schemes by comparing the associated approximate posterior moments and predictive functionals with that obtained under of i.i.d. sampling.
 As for predictive functionals of interest, the Gaussianity of MF approximation leads to simple closed-form expression easily evaluated.
 
 ``` r
@@ -262,7 +261,7 @@ Partially-factorized mean-field variational Bayes (PFM-VB)
 
 Secondly, we implement partially-factorized mean-field variational Bayes, returning the optimal approximate joint posterior *q*\*<sub>PFM-VB</sub>(**β**,**z**<sub>0</sub>) within the class $\cal{Q}$<sub>PFM-VB</sub> = {*q*(**β**,**z**<sub>0</sub>) :  *q*(**β**,**z**<sub>0</sub>) = *q*(**β** |  **z**<sub>0</sub>) $\prod~_{i=1}^{n_0}$ *q*(*z*<sub>0[i]</sub>) }.
 
-While can be easily seen that *q*\*<sub>PFM-VB</sub>(**β** | **z**<sub>0</sub>) = *p*(**β** | **z**<sub>0</sub>) , as detailed in Section 4.3.1 of the paper, the optimal marginal density *q*\*<sub>PFM-VB</sub>(**β**) = $\int$ *q*\*<sub>PFM-VB</sub>(**β**, **z**<sub>0</sub>) d**z**<sub>0</sub> = $\int$ *p*(**β** | **z**<sub>0</sub>) $\prod~_{i=1}^{n_0}$ *q*\*<sub>PFM-VB</sub>(*z*<sub>0[i]</sub>) d*z*<sub>0[i]</sub> corresponds to SUN random variable with a specific structure.
+As detailed in Section 4.3.1 of the paper, the optimal density *q*\*<sub>PFM-VB</sub>(**β**) = $\int$ *q*\*<sub>PFM-VB</sub>(**β**, **z**<sub>0</sub>) d**z**<sub>0</sub> = $\int$ *p*(**β** | **z**<sub>0</sub>) $\prod~_{i=1}^{n_0}$ *q*\*<sub>PFM-VB</sub>(*z*<sub>0[i]</sub>) d*z*<sub>0[i]</sub> corresponds to a SUN random variable with a specific structure.
 Indeed, the covariance matrix appearing within the Gaussian cdf term of the SUN density *q*\*<sub>PFM-VB</sub>(**β**) has non-zero elements only on the main diagonal, which allow for straightforward calculations of the corresponding moments.
 We refer to [Fasano, Durante and Zanella (2022)](https://doi.org/10.1093/biomet/asac026) for further explanations.
 
@@ -312,7 +311,7 @@ Expectation-propagation (EP)
 ----------------------------
 
 We conclude by producing the code for obtaining the optimal EP approximation *q*\*<sub>EP</sub>(**β**), as described in Section 4.3.2 of the paper. As highlighted therein, we introduce a novel and efficient implementation of the EP updates, achieving linear cost per iteration in the number of covariates *p*. 
-Without such a feature, the previously accomplished quadratic cost in *p* would make EP non-competitively slow in high-dimensional scenarios, compared to the variational procedures implemented above.
+Without such a feature, the quadratic cost in *p* of previous EP implementations would provide prohibitively slow routines in high-dimensional scenarios, compared to the variational procedures implemented above.
 
 ``` r
 # Get parameters
