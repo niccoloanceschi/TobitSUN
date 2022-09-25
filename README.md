@@ -12,7 +12,7 @@ The complete tutorial can be found in the file [`ApplicationTutorial.md`](https:
 
 We highlight that the `EP` routine reported in the present repository leverages a novel efficient implementations proposed in the article, crucially improving scalability to high-dimensional scenarios relative to alternative implementations in the literature. 
 
-**WE REFER TO SECTION 4 IN THE ARTICLE FOR DETAILS ON ALL THE COMPUTATIONAL METHODS IMPLEMENTED IN THIS REPOSITORY**
+**WE REFER TO SECTION 4 IN THE ARTICLE FOR DETAILS ON ALL THE COMPUTATIONAL METHODS IMPLEMENTED HERE**
 
 The **functions to implement the above methods** can be found in the `R` source file [`functionsTobit.R`](https://github.com/niccoloanceschi/TobitSUN/blob/main/functionsTobit.R), and a **tutorial** explaining in detail the usage of these functions is available in the file [`functionsTutorial.md`](https://github.com/niccoloanceschi/TobitSUN/blob/main/functionsTutorial.md). 
 
