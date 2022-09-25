@@ -1,19 +1,19 @@
 Introduction
 ============
 
-As described in the [`README.md`](https://github.com/niccoloanceschi/TobitSUN/blob/main/README.md) file, this tutorial provides details on the functions required to **implement most of the methods presented in Section 4 of the paper**, in the specific case of **tobit regression**. The `R` source file can be found in [`functionsTobit.R`](https://github.com/niccoloanceschi/TobitSUN/blob/main/functionsTobit.R).
+As described in the [`README.md`](https://github.com/niccoloanceschi/TobitSUN/blob/main/README.md) file, this tutorial provides details on the functions required to **implement the main methods presented in Section 4 of the paper**, in the specific case of **tobit regression**. The `R` source file can be found in [`functionsTobit.R`](https://github.com/niccoloanceschi/TobitSUN/blob/main/functionsTobit.R).
 
 
 Implemented functions
 ------------------------
 
-The **list of the main implemented functions** is reported below. Each of them is then analyzed in detail in the following.
+The **list of the implemented functions** is reported below. Each of them is then analyzed in detail in the following.
 
 -   `rSUNpost`: samples from the exact [**SUN**](https://doi.org/10.1093/biomet/asz034) posterior distribution.
 -   `getParamsMF`: returns the parameters of the optimal mean-field variational approximation ([**MF-VB**](https://doi.org/10.1080/01621459.2017.1285773) in the paper).
 -   `getParamsPFM`: returns the parameters of the optimal partially-factorized mean-field variational approximation ([**PFM-VB**](https://doi.org/10.1093/biomet/asac026) in the paper). 
 -   `getParamsEP`: returns the parameters of the optimal expectation propagation approximation ([**EP**](https://doi.org/10.1214/16-STS581) in the paper).
--   `generateData`: generate the data to replicate the simulation studies from Section 5 of the paper
+-   `generateData`: generate the data to replicate the simulation studies from Section 5 in the paper.
 
 ### `rSUNpost`
 
@@ -116,7 +116,7 @@ This function implements the **CAVI** algorithm to obtain the optimal **MF-VB** 
 -   `tolerance`: absolute change in the ELBO[*q*<sub>MF-VB</sub>( **β** , **z** )] used to establish convergence
 -   `maxIter`: maximum number of allowed iterations before stopping
 -   `fullVar`: boolean parameter. If `FALSE`, only the approximate marginal variances are returned. If `TRUE`, the full variance-covariance matrix is returned
--   `nPrint`: number of iterations between consecutive status updates
+-   `nPrint`: number of iterations between consecutive printings of the status updates for the routine 
 
 **Output**: A list containing
 
@@ -270,17 +270,14 @@ This function implements the **CAVI** algorithm to obtain the optimal **PFM-VB**
 -   `maxIter`: maximum number of allowed iterations before stopping
 -   `fullVar`: boolean parameter. If `FALSE`, only the approximate marginal variances are returned. If `TRUE`, the full variance-covariance matrix is returned
 -   `predictive`: boolean parameter. If `TRUE`, returns several quantities, useful for evaluating predictive functionals and already evaluated to implement the CAVI updates.
--   `nPrint`: number of iterations between consecutive status updates
+-   `nPrint`: number of iterations between consecutive printings of the status updates for the routine
 
 **Output**: A list containing
 
--   `mu`: optimal values of the location parameters in equation (20) of the paper. The i-th entry `mu[i]` corresponds to: <br/>
- &emsp; $\mathbb{E}$<sub>**β**,**z**<sub>-i</sub></sub>$[$**μ**<sub>i</sub>$]$ = **γ**<sub>post[i]</sub> + **Γ**<sub>post[i,-i]</sub> $($**Γ**<sub>post[-i,-i]</sub>$)$<sup>-1</sup> $(\mathbb{E}$<sub>**β**,**z**<sub>-i</sub></sub>$[$**z**<sub>-i</sub>$]$ - **γ**<sub>post[-i]</sub>$)$
--   `sigma2`: optimal values of the scale parameters in equation (20) of the paper. The i-th entry`sigma2[i]` corresponds to: <br/> 
- &emsp; **Γ**<sub>post[i,i]</sub> - **Γ**<sub>post[i,-i]</sub> $($**Γ**<sub>post[-i,-i]</sub>$)$<sup>-1</sup> **Γ**<sub>post[-i,i]</sub>
+-   `postMoments`: list containing the posterior mean (`postMoments.meanBeta`) and posterior variances (`postMoments.varBeta`) of **β**, according to the optimal PFM-VB approximate posterior. If `fullVar` is set to `TRUE`, `postMoments.varBeta` provides the full covariance matrix, otherwise it stores only the marginal variances.   
 -   `nIter`: number of iterations required by the CAVI, either because it converged or because the maximum number of iterations `maxIter` was reached
--   `postMoments`: list containing the posterior mean (`postMoments.meanBeta`) and posterior variances (`postMoments.varBeta`) of **β**, according to the optimal PFM-VB approximate posterior. If `fullVar` is set to `TRUE`, `postMoments.varBeta` provides the full covariance matrix, otherwise it stores only the marginal variances
--   (optional, if `predictive` is set to `TRUE`) `postPredictive`: useful quantities for saving computational time in evaluating predictive functionals (`postPredictive.VXt` and `postPredictive.VinvOmega0beta0`, corresponding respectively to **V**<sub>post</sub> **X**<sub>0</sub><sup>T</sup> and **V**<sub>post</sub> **Ω**<sub>post</sub><sup>-1</sup> **ξ**<sub>post</sub> )
+-   `mu` and `sigma2`: optimal values of the location and scale parameters in equation (20) of the paper. 
+-   (optional, if `predictive` is set to `TRUE`) `postPredictive`: useful quantities for saving computational time in evaluating predictive functionals (`postPredictive.VXt` and `postPredictive.VinvOmega0beta0`)
 
 ``` r
 getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
@@ -478,7 +475,7 @@ This function implements the **moment matching** updates to obtain the optimal *
 -   `maxIter`: maximum number of allowed iterations before stopping
 -   `fullVar`: boolean parameter. If `FALSE`, only the approximate marginal variances are returned. If `TRUE`, the full variance-covariance matrix is returned
 -   `predictive`: boolean parameter. If `TRUE`, returns several quantities, useful for evaluating predictive functionals and already evaluated to implement the EP updates.
--   `nPrint`: number of iterations between consecutive status updates
+-   `nPrint`: number of iterations between consecutive printings of the status updates for the routine
 
 **Output**: A list containing
 
@@ -491,7 +488,7 @@ This function implements the **moment matching** updates to obtain the optimal *
 -   `mEP`: vector of *n*<sub>0</sub> real parameters, that uniquely determine the location parameter of the approximate Gaussian sites. For the i-th entry <code>m<sub>EP</sub>[i]</code>, it holds that
 **r**<sub>i</sub> = m<sub>EP</sub>[i] **X**<sub>0</sub>[i,]<sup>T</sup>
 -   (optional, if `fullVar` is set to `TRUE`) `Omega`: full covariance matrix of optimal EP approximate posterior
--   (optional, if `predictive` is set to `TRUE` and if *p*$\geq$*n*<sub>0</sub>) `postPredictive`: useful quantities for saving computational time in evaluating predictive functionals (`postPredictive.U` and `postPredictive.U0`, corresponding respectively to **Ω**\*<sub>EP</sub> **X**<sub>0</sub><sup>T</sup> and **Ω**<sub>post</sub> **X**<sub>0</sub><sup>T</sup> )
+-   (optional, if `predictive` is set to `TRUE` and if *p*$\geq$*n*<sub>0</sub>) `postPredictive`: useful quantities for saving computational time in evaluating predictive functionals (`postPredictive.U` and `postPredictive.U0`)
 
 ``` r
 getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
@@ -702,13 +699,13 @@ getParamsEP = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
 
 ### `generateData`
 
-This function **generate the data** analyzed in the **simulation studies** reported in Section 5 of the paper.
+This function **generates the data** analyzed in the **simulation studies** reported in Section 5 of the paper.
 
 **Input**:
 
 -   `n`: total number of in-sample observations
 -   `p`: number of covariates/parameters
--   `k`: percentage of censored observations (*100*$\cdot\kappa$ in the paper, as integer)
+-   `k`: percentage of censored observations
 -   `nTest`: total number of out-of-sample observations
 -   `beta`: true value of the parameters (optional)
 -   `seed`: seed of the random number generator
