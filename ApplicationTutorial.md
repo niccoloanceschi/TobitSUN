@@ -112,12 +112,7 @@ betaSUN = rSUNpost(X1,y1,X0,y0,om2p,zT,nSample,seed=seed)
 timeSUN = difftime(Sys.time(), startTime, units=("secs"))[[1]]
 ```
 
-We leverage on the i.i.d. samples obtained above to evaluate empirical **posterior moments** and **predictive functionals**. Later on, we are going to use these quantities as a ground-truth to validate and compare with one another the outcomes of different approximation schemes. As for predictive functionals, we assess performance by computing expected value and censoring probability for every statistical unit *y*<sub>NEW</sub>$,$**x**<sub>NEW</sub> within the $n$<sub>Test</sub> out-sample observations, simulated together with the original training data :</br>
-&emsp; $\mathbb{E}$ [ *y*<sub>NEW</sub> | **y**<sub>1</sub>, **y**<sub>0</sub> ] =
-$\mathbb{E}$ [ *z*<sub>NEW</sub> | *z*<sub>NEW</sub>>0, **y**<sub>1</sub>, **y**<sub>0</sub>] =
-$\mathbb{E}$ [ $\phi$(**x**<sub>NEW</sub>$^{\intercal}$**β**) + (**x**<sub>NEW</sub>$^{\intercal}$**β**) $\Phi$(**x**<sub>NEW</sub>$^{\intercal}$**β**) | **y**<sub>1</sub>, **y**<sub>0</sub> ] </br>
-&emsp; $\mathbb{P}$ [ *y*<sub>NEW</sub> = 0 | **y**<sub>1</sub>, **y**<sub>0</sub> ] = $\mathbb{E}$ [ $\Phi$(-**x**<sub>NEW</sub>$^{\intercal}$**β**) |  **y**<sub>1</sub>, **y**<sub>0</sub> ] . </br>
-Note that, as mentioned before, in the above formulas we implicitely absorbed the censoring thershold *z*<sub>T</sub> within the intercept term.
+We leverage the i.i.d. samples obtained above to evaluate empirical **posterior moments** and **predictive functionals**. Later on, we are going to use these quantities as a ground-truth to validate and compare the outcomes of the different approximation schemes. As for predictive functionals, we assess performance by computing the expected value and censoring probability for every statistical unit *y*<sub>NEW</sub>$,$**x**<sub>NEW</sub> within the $n$<sub>Test</sub> observations (refer to the article for the analytical expression of such quantities). Note that, as mentioned before, in the above formulas we implicitely absorbed the censoring thershold *z*<sub>T</sub> within the intercept term.
 
 ``` r
 # First 2 marginal moments
