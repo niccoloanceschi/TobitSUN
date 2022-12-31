@@ -104,7 +104,7 @@ We begin our analysis by considering sampling-based approaches to posterior infe
 Exact sampling from the unified skew-normal posterior (i.i.d.)
 --------------------------------------------------------------
 
-Samples from the exact unified skew-normal posterior are drawn via the algorithm by [Durante  (2019)](https://doi.org/10.1093/biomet/asz034), which in particular makes use of the minimax optimal exponential tilting method by [Botev (2017)](https://doi.org/10.1111/rssb.12162) for sampling from the multivariate truncated normal component.
+Samples from the exact unified skew-normal posterior are drawn via the algorithm by [Durante  (2019)](https://doi.org/10.1093/biomet/asz034), which relies on the method by [Botev (2017)](https://doi.org/10.1111/rssb.12162) for sampling from the multivariate truncated normal component.
 
 ``` r
 startTime = Sys.time()
