@@ -62,7 +62,7 @@ k = 50
 n = 200             # total in-sample observations
 nTest = 200         # total out-sample observations
 
-om2p = 25*10/p      # marginal prior variances
+om2p = 25*10/p      # prior variances
 
 seed = 123          # seed for random number generation 
     
