@@ -19,7 +19,7 @@ In doing so, we abide to the recommended practice of standardizing the predictor
 Posterior inference relies on  spherical Gaussian priors $\cal{N}_p$(**0**$,\omega_p^2$**Ι**$_p$), with $\omega_p^2=25 \cdot 10 \, /p$, inducing increasing shrinkage in high dimensions.
 Note that the varying threshold $z_T$ poses no difficulties in Bayesian inference since it directly enters the intercept term.
 
-The results from Section 5 correspond to different combinations of the aforementioned hyperparameters, in particular:
+The results from Section 5 correspond to different combinations of the aforementioned settings, in particular:
 
 -   *p* $\in$ { $10,20,50,100,200,400,800,1200$ }
 -   *k* $\in$ { $15,50,85$ }
