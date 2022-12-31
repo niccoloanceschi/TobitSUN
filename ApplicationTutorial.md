@@ -343,7 +343,7 @@ predProbEP = pnorm(-locPredEP/sdPredEP)
 Running times and number of iterations
 --------------------------------------
 
-We can now visualize the running times, as medians over 10 independent repetitions, which correspond to producing a zoom of Table 2 from Section 5 of the paper, for the selected values of *p* and *k* (or equivalently $\kappa$).
+We can now visualize the running times, as medians over 20 independent repetitions, which correspond to producing a zoom of Table 2 from Section 5 of the paper, for the selected values of *p* and *k* (or equivalently $\kappa$).
 
 ``` r
 library("microbenchmark")
