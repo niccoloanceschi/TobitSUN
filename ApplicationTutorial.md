@@ -321,7 +321,7 @@ nIterEP = paramsEP$nIter
 meanBetaEP = paramsEP$meanBeta
 logDevStdBetaEP = log(sqrt(paramsEP$diagOmega))
 
-# Posterior Predictive
+# Predictive functionals
 if(p>=n0){
   XXtT = X1%*%t(Xtest)
   invXXt = solve(diag(1.,n1,n1)+om2p*tcrossprod(X1))
