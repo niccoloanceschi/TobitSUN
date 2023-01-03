@@ -141,27 +141,27 @@ To do so, we recall that the tobit regression can be mapped into a totally unbal
 Accordingly, we define below the familiar structure of probit regression under a general Gaussian prior, further representing the parameters of interest **β** as a suitable transformation of an underlying vector **β**<sub>0</sub> with standard normal entries.  
 
 ``` r
-probitModel = "data{
+probitModel = " data{
                     int<lower=0> K;
                     int<lower=0> N;
                     int<lower=0,upper=1> Y[N];
                     matrix[N,K] X;
                     matrix[K,K] Chol;
                     vector[K] xi;
-                    }
-                    parameters {
-                        vector[K] beta0;
-                    }
-                    transformed parameters {
-                        vector[K] beta;
-                        beta = xi + Chol * beta0;
-                    }
-                    model {
-                        for(j in 1:K)
-                            target += normal_lpdf(beta0[j] | 0, 1);
-                        for(n in 1:N)
-                            target += normal_lcdf((2*Y[n]-1)*(X[n]*beta) | 0, 1);
-                    }"
+                }
+                parameters {
+                    vector[K] beta0;
+                }
+                transformed parameters {
+                    vector[K] beta;
+                    beta = xi + Chol * beta0;
+                }
+                model {
+                    for(j in 1:K)
+                        target += normal_lpdf(beta0[j] | 0, 1);
+                    for(n in 1:N)
+                        target += normal_lcdf((2*Y[n]-1)*(X[n]*beta) | 0, 1);
+                } "
 ```
 
 Secondly, we evaluate the parameters of the updated Gaussian prior $\cal{N}_p$(**ξ**<sub>1</sub>,**Ω**<sub>1</sub>).
