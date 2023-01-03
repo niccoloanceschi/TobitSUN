@@ -227,7 +227,7 @@ $\cal{Q}$<sub>MF-VB</sub> = { *q*(**β**,**z**<sub>0</sub>) :  *q*(**β**,**z**<
 paramsMF = getParamsMF(X1,y1,X0,y0,om2p,zT)
 ```
 
-As mentioned above, we validate empirically the quality of the different approximation schemes by comparing the associated approximate posterior moments and predictive functionals with that obtained under of i.i.d. sampling.
+As mentioned above, we validate empirically the quality of the different approximation schemes by comparing the associated approximate posterior moments and predictive functionals with that obtained via i.i.d. sampling.
 As for predictive functionals of interest, the Gaussianity of MF approximation leads to simple closed-form expressions easily evaluated.
 
 ``` r
