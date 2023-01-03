@@ -26,7 +26,7 @@ The results from Section 5 correspond to different combinations of the aforement
 -   $n = 200$
 -   $n$<sub>Test</sub> $= 200$
 
-**For illustrative purposes, we focus here on the setting *p* $=$ 50 and *k* $=$ 50**. The other scenarios in Section 5 can be readily implemented by changing *p* and *k* in the code below.
+**For illustrative purposes, we focus here on the setting *p* $=$ 50 and *k* $=$ 50**. The other scenarios analyzed in Section 5 can be readily implemented by changing *p* and *k* in the code below.
 
 Setting the hyperparameters, loading data and required packages
 ===============================================================
