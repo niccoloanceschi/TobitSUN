@@ -461,7 +461,7 @@ getParamsPFM = function(X1,y1,X0,y0,om2,zT,tolerance=1e-3,maxIter=1e3,
 
 ### `getParamsEP`
 
-This function implements the **moment matching** updates to obtain the optimal **EP** approximate posterior. In particular, this is done by leveraging a novel implementation, that achieve unprecedented computational efficiency in high-dimensional scenarios (see Section 4 of the paper). Indeed, the cost per iteration in alternative implementations achieves quadratic growth in *p* at best, while in the present version such cost is reduced to a linear growth.
+This function implements the **moment matching** updates to obtain the optimal **EP** approximate posterior. In particular, this is done by leveraging a novel implementation, that achieves unprecedented computational efficiency in high-dimensional scenarios (see Section 4 of the paper). Indeed, the cost per iteration in alternative implementations achieves quadratic growth in *p* at best, while in the present version such cost is reduced to a linear growth.
 
 **Input**:
 
